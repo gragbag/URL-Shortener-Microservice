@@ -33,10 +33,8 @@ const urls = new Map();
 const shortUrls = new Map();
 
 app.post('/api/shorturl', (req, res) => {
-  console.log(urls);
-  console.log(shortUrls);
   const url = req.body.url;
-  const hostname = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const hostname = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
 
   dns.lookup(hostname, (error, address, family) => {
     if (error) {
@@ -55,8 +53,8 @@ app.post('/api/shorturl', (req, res) => {
       }
 
       res.send({
-        "original_url": url,
-        "short_url": url_index
+        original_url: url,
+        short_url: url_index
       })
     }
   })
@@ -64,9 +62,8 @@ app.post('/api/shorturl', (req, res) => {
   
 })
 
-app.use('/api/shorturl/:short_url?', (req, res) => {
+app.use('/api/shorturl/:short_url', (req, res) => {
   const url = shortUrls.get(Number.parseInt(req.params.short_url));
-  console.log(url);
   if (!url) {
     res.send({
       "error": "invalid short url"
